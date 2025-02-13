@@ -1,14 +1,14 @@
 <template>
   <div class="Home">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl">
+    <header class="bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl ">
       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <!-- Logo e Nome -->
         <div class="flex items-center space-x-3">
           <img src="https://via.placeholder.com/50" alt="Logo" class="w-12 h-12 rounded-full border-2 border-white"/>
           <span class="text-2xl font-semibold tracking-wide">Farmacia+</span>
         </div>
-        
+            
         <!-- Navegação -->
         <nav class="space-x-6 hidden md:flex">
           <a href="#" class="hover:text-gray-300 transition-colors">Home</a>
