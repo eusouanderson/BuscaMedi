@@ -109,6 +109,7 @@ export default {
 
 <style scoped>
 .Home {
+  background-image: url('@/assets/images/medicine.jpg');
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -116,6 +117,7 @@ export default {
 
 .Form {
   background-color: rgba(255, 255, 255, 0.9);
+  
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -125,7 +127,7 @@ export default {
 }
 
 .sticky-search {
-  position: fixed;
+  position: relative;
   top: 88px;
   left: 50%;
   transform: translateX(-50%);
