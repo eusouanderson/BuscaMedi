@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import NodeCache from "node-cache"; // 🔹 Substitui Redis por NodeCache
+import NodeCache from "node-cache"; 
 import Product from "./models/Product.js";
 
 dotenv.config();
@@ -12,9 +12,9 @@ app.use(express.json());
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
-const cache = new NodeCache({ stdTTL: 3600 }); // 🔹 Cache expira em 1 hora
+const cache = new NodeCache({ stdTTL: 3600 }); 
 
-// 🔹 Conexão com MongoDB
+
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -24,7 +24,7 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "Erro na conexão com o MongoDB:"));
 db.once("open", () => console.log("Conectado ao MongoDB Atlas!"));
 
-// 🔹 Middleware para verificar cache
+
 const checkCache = (req, res, next) => {
   const { name } = req.params;
   const cachedData = cache.get(name);
@@ -34,10 +34,10 @@ const checkCache = (req, res, next) => {
     return res.json(cachedData);
   }
 
-  next(); // Se não há cache, continua para o MongoDB
+  next();
 };
 
-// 🔹 Rota para buscar todos os produtos
+
 app.get("/", (req, res) => {
   res.send("BuscaFarma API");
 });
@@ -51,23 +51,21 @@ app.get("/products", async (req, res) => {
   }
 });
 
-// 🔹 Rota para buscar um produto pelo ID (com cache)
+
 app.get("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 🔹 Primeiro tenta recuperar do cache
+    
     const cachedProduct = cache.get(id);
     if (cachedProduct) {
       console.log("🔹 Produto encontrado no cache!");
       return res.json(cachedProduct);
     }
-
-    // 🔹 Se não estiver no cache, busca no MongoDB
+    
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ error: "Produto não encontrado" });
 
-    // 🔹 Salva no cache por 1 hora
     cache.set(id, product);
 
     res.json(product);
@@ -76,7 +74,6 @@ app.get("/products/:id", async (req, res) => {
   }
 });
 
-// 🔹 Rota para buscar produtos pelo nome (com cache)
 app.get("/products/search/:name", checkCache, async (req, res) => {
   try {
     const { name } = req.params;
@@ -93,7 +90,6 @@ app.get("/products/search/:name", checkCache, async (req, res) => {
       return res.status(404).json({ message: "Nenhum produto encontrado" });
     }
 
-    // 🔹 Salva no cache por 1 hora
     cache.set(name, products);
 
     res.json(products);
@@ -103,3 +99,5 @@ app.get("/products/search/:name", checkCache, async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+
+export default app;
