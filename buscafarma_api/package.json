@@ -1,4 +1,8 @@
-{
+{	
+	"name": "buscafarma_api",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
 	"scripts": {
 		"dev": "nodemon server.js",
 		"start": "node server.js"
