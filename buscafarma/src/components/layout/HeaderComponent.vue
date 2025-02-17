@@ -11,9 +11,9 @@
 
         <!-- Navegação Desktop -->
         <nav class="hidden md:flex space-x-6">
-          <a href="#" class="hover:text-gray-300 transition-colors">Home</a>
-          <a href="#" class="hover:text-gray-300 transition-colors">Sobre</a>
-          <a href="#" class="hover:text-gray-300 transition-colors">Serviços</a>
+          <a href="#" class="hover:text-gray-300 transition-colors">Quem somos</a>
+          <a href="#" class="hover:text-gray-300 transition-colors">Saude e bem estar</a>
+          <a href="#" class="hover:text-gray-300 transition-colors">Farmacias Parceiras</a>
           <a href="#" class="hover:text-gray-300 transition-colors">Contato</a>
         </nav>
 
@@ -27,9 +27,9 @@
     <!-- Menu Mobile -->
     <div v-if="menuOpen" class="md:hidden bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl rounded-t-3xl transition-all">
       <div class="p-4 flex flex-col space-y-8">
-        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Home</a>
-        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Sobre</a>
-        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Serviços</a>
+        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Quem somos</a>
+        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Saude e bem estar</a>
+        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Farmacias Parceiras</a>
         <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Contato</a>
       </div>
     </div>

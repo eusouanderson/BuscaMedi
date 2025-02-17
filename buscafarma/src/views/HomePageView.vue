@@ -14,18 +14,31 @@
               v-model="searchQuery"
               class="w-full p-4 border border-gray-300 rounded-lg text-sm"
               placeholder="Digite o nome do medicamento..."
-              @input="searchMedicines"
+              @input="handleInput"
             />
+            <!-- Lista de sugestões -->
+            <ul v-if="suggestions.length > 0" class="suggestions-list">
+              <li 
+                v-for="suggestion in suggestions"
+                :key="suggestion._id"
+                @click="selectMedicine(suggestion)"
+              >
+                {{ suggestion.name }}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
-
       <button 
         @click="clearSearch"
         class="clear-btn"
       >
         Limpar
       </button>
+    </div>
+    <!---Icone de carregamento-->
+    <div v-if="loading" class="loading">
+      <font-awesome-icon icon="spinner" spin />
     </div>
 
     <!-- Resultados de busca -->
@@ -40,8 +53,12 @@
           <img :src="medicine.image_url" :alt="medicine.name" class="w-16 h-16 object-contain mb-2" />
           <h4 class="text-sm font-semibold">{{ medicine.name }}</h4>
           <p class="text-xs text-gray-500">{{ medicine.manufacturer }}</p>
-          <p class="text-sm text-blue-800 font-bold">{{ medicine.price }}</p>
           <p class="text-xs text-gray-600">{{ medicine.offer }}</p>
+          <p class="text-sm text-blue-800 font-bold">{{ medicine.price }}</p>
+          <button class="search-link-btn" @click="openSearchLink(medicine.search_link)">
+            Pesquisar no google
+          </button>
+          
           <button 
             class="add-to-cart-btn"
             @click="addToCart(medicine)"
@@ -74,13 +91,62 @@ export default {
     return {
       searchQuery: '',
       medicines: [],
+      suggestions: [],
       error: null,
       cart: [],
+      loading: false,
     };
   },
   methods: {
-    async searchMedicines() {
+    // Método para lidar com a entrada do usuário e fazer a busca
+    async handleInput() {
+      if (this.searchQuery.length < 3) {
+        this.suggestions = [];
+        this.medicines = [];
+        return;
+      }
+
+      // Tenta obter sugestões do localStorage
+      const cachedSuggestions = localStorage.getItem(this.searchQuery);
+
+      if (cachedSuggestions) {
+        // Se houver dados no localStorage, use-os
+        console.log("Usando dados do cache.");
+        const cachedData = JSON.parse(cachedSuggestions);
+        this.suggestions = cachedData.filter(medicine =>
+          medicine.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+        this.medicines = cachedData;
+        return;
+      }
+
+      try {
+        this.loading = true;
+        const response = await this.fetchMedicines();  // Corrigido para chamar diretamente fetchMedicines
+        if (Array.isArray(response)) {
+          // Filtra as sugestões de acordo com a pesquisa
+          this.suggestions = response.filter(medicine =>
+            medicine.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+          );
+          this.medicines = response;
+
+          // Armazena os resultados no localStorage para consultas futuras
+          localStorage.setItem(this.searchQuery, JSON.stringify(response));
+        } else {
+          this.suggestions = [];
+          this.medicines = [];
+        }
+      } catch (err) {
+        this.error = "Erro ao buscar sugestões.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // Método para buscar os medicamentos
+    async fetchMedicines() {
       if (!this.searchQuery.trim()) {
+        this.suggestions = [];
         this.medicines = [];
         return;
       }
@@ -88,27 +154,55 @@ export default {
       this.error = null;
 
       try {
-        this.medicines = await searchMedicines(this.searchQuery);
+        const response = await searchMedicines(this.searchQuery); // Chama a função de busca externa
+        if (Array.isArray(response)) {
+          this.medicines = response;
+          return response; // Retorna a resposta para uso no handleInput
+        } else {
+          this.medicines = [];
+          return [];
+        }
       } catch (err) {
-        this.error = 'Erro ao buscar medicamentos.';
+        this.error = "Erro ao buscar medicamentos.";
+        return [];
       }
     },
+
+    // Método para selecionar um medicamento
+    selectMedicine(medicine) {
+      this.searchQuery = medicine.name;
+      this.suggestions = [];
+      this.fetchMedicines();  // Corrigido para chamar diretamente fetchMedicines
+    },
+
+    // Método para limpar a pesquisa
     clearSearch() {
-      this.searchQuery = ''; 
+      this.searchQuery = '';
       this.medicines = [];
     },
+
+    // Método para adicionar ao carrinho
     addToCart(medicine) {
       this.cart.push(medicine);
     },
+
+    // Método para limpar o carrinho
     clearCart() {
       this.cart = []; // Limpa o carrinho
     },
+
+    // Método para abrir o link de pesquisa
+    openSearchLink(link) {
+      if (link) {
+        window.open(link, '_blank');
+      } else {
+        console.error("O link de pesquisa não está disponível.");
+      }
+    },
   },
 };
+
 </script>
-
-
-
 
 
 <style scoped>
@@ -192,6 +286,16 @@ export default {
 .clear-btn:focus {
   outline: 3px solid #1e40af; /* Indicação clara de foco */
 }
+.search-link-btn {
+  margin-top: 10px;
+  background-color: #1e40af; /* Cor azul contrastante */
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
 
 
 
@@ -216,6 +320,21 @@ export default {
 /* Ajuste para resultados */
 .results {
   margin-top: 120px;
+}
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
 }
 </style>
 

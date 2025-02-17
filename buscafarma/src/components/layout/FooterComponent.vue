@@ -10,9 +10,9 @@
 
         <!-- Navegação -->
         <nav class="space-x-6 flex mb-4 md:mb-0">
-          <a href="#" class="hover:text-gray-300 transition-colors">Home</a>
-          <a href="#" class="hover:text-gray-300 transition-colors">Sobre</a>
-          <a href="#" class="hover:text-gray-300 transition-colors">Serviços</a>
+          <a href="#" class="hover:text-gray-300 transition-colors">Quem somos</a>
+          <a href="#" class="hover:text-gray-300 transition-colors">Saúde e bem estar</a>
+          <a href="#" class="hover:text-gray-300 transition-colors">Farmacias Parceiras</a>
           <a href="#" class="hover:text-gray-300 transition-colors">Contato</a>
         </nav>
 
