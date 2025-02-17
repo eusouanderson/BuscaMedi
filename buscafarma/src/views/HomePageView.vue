@@ -1,10 +1,9 @@
 <template>
   <div class="Home">
-    <!-- Formulário de busca -->
     <div 
-      :class="['Form', { 'sticky-search': isScrolled && !isMinimized, 'minimized': isMinimized }]"
+      :class="['Input', { 'sticky-search': medicines.length > 0 }]"
     >
-      <div class="bg-gray-100 py-2">
+      <div class="py-2">
         <div class="container mx-auto px-4">
           <h2 class="text-3xl font-semibold text-center text-blue-800 mb-2">
             Encontre o melhor preço para seus medicamentos
@@ -13,43 +12,42 @@
             <input
               type="text"
               v-model="searchQuery"
-              class="w-full p-3 border border-gray-300 rounded-lg"
-              placeholder="Exemplo: Paracetamol, Ibuprofeno..."
+              class="w-full p-4 border border-gray-300 rounded-lg text-sm"
+              placeholder="Digite o nome do medicamento..."
               @input="searchMedicines"
             />
-            <button
-              @click="searchMedicines"
-              class="w-full mt-2 p-3 bg-blue-800 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Buscar
-            </button>
           </div>
         </div>
       </div>
+
       <button 
-        @click="toggleMinimized"
-        class="absolute top-2 right-2 p-2 bg-blue-800 text-white rounded-full"
+        @click="clearSearch"
+        class="clear-btn"
       >
-        {{ isMinimized ? 'Maximizar' : 'Minimizar' }}
+        Limpar
       </button>
     </div>
 
     <!-- Resultados de busca -->
-    <div v-if="medicines.length > 0" 
-         :style="{ marginTop: isScrolled ? '120px' : '120px' }" 
-         class="container mx-auto px-4 py-6">
+    <div v-if="medicines.length > 0" class="container mx-auto px-4 py-6 results">
       <h3 class="text-2xl font-semibold text-blue-800 mb-4 text-center">Resultados encontrados</h3>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div
           v-for="medicine in medicines"
           :key="medicine._id"
-          class="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center"
+          class="bg-white shadow-md rounded-lg p-4 flex flex-col items-center text-center space-y-2"
         >
-          <img :src="medicine.image_url" :alt="medicine.name" class="w-24 h-24 object-contain mb-3" />
-          <h4 class="text-lg font-semibold text-center">{{ medicine.name }}</h4>
-          <p class="text-sm text-gray-500">{{ medicine.manufacturer }}</p>
-          <p class="text-lg text-blue-800 font-bold">{{ medicine.price }}</p>
-          <p class="text-sm text-gray-600">{{ medicine.offer }}</p>
+          <img :src="medicine.image_url" :alt="medicine.name" class="w-16 h-16 object-contain mb-2" />
+          <h4 class="text-sm font-semibold">{{ medicine.name }}</h4>
+          <p class="text-xs text-gray-500">{{ medicine.manufacturer }}</p>
+          <p class="text-sm text-blue-800 font-bold">{{ medicine.price }}</p>
+          <p class="text-xs text-gray-600">{{ medicine.offer }}</p>
+          <button 
+            class="add-to-cart-btn"
+            @click="addToCart(medicine)"
+          >
+            Adicionar ao carrinho
+          </button>
         </div>
       </div>
     </div>
@@ -57,21 +55,27 @@
     <div v-if="error" class="text-red-600 text-center mt-4">
       {{ error }}
     </div>
+
+    <!-- Importando o componente de carrinho -->
+    <Cart :cart="cart" @clearCart="clearCart" />
   </div>
 </template>
 
 <script>
 import { searchMedicines } from '@/services/medicineService';
+import Cart from '@/components/Cart.vue'; // Importando o componente de carrinho
 
 export default {
   name: 'HomeComponent',
+  components: {
+    Cart, // Registrando o componente
+  },
   data() {
     return {
       searchQuery: '',
       medicines: [],
       error: null,
-      isScrolled: false,
-      isMinimized: false,
+      cart: [],
     };
   },
   methods: {
@@ -89,80 +93,129 @@ export default {
         this.error = 'Erro ao buscar medicamentos.';
       }
     },
-    handleScroll() {
-      if (!this.isMinimized) {
-        this.isScrolled = window.scrollY > 100;
-      }
+    clearSearch() {
+      this.searchQuery = ''; 
+      this.medicines = [];
     },
-    toggleMinimized() {
-      this.isMinimized = !this.isMinimized;
-    }
-  },
-  mounted() {
-    window.addEventListener("scroll", this.handleScroll);
-  },
-  beforeUnmount() {
-    window.removeEventListener("scroll", this.handleScroll);
+    addToCart(medicine) {
+      this.cart.push(medicine);
+    },
+    clearCart() {
+      this.cart = []; // Limpa o carrinho
+    },
   },
 };
 </script>
 
+
+
+
+
 <style scoped>
 .Home {
   background-image: url('@/assets/images/medicine.jpg');
+  background-size: cover;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.Form {
+/* Input centralizado inicialmente */
+.Input {
   background-color: rgba(255, 255, 255, 0.9);
-  
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin: auto;
-  position: relative;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1000;
+  margin-top: 20vh; /* 20% da altura da tela */
 }
 
+/* Input que fica fixo no topo após a pesquisa */
 .sticky-search {
-  position: relative;
-  top: 88px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto;
-  max-width: 50%;
-  z-index: 50;
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  padding: 10px;
-  transition: top 0.3s ease, padding 0.3s ease, width 0.3s ease;
-  max-height: calc(100vh - 88px);
-}
-
-/* Estilo quando o formulário está minimizado */
-.Form.minimized {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 200px;
-  padding: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  color: #1e40af; /* Cor azul contrastante */
+  top: 0;
+  width: 100%;
+  padding: 15px 20px;
+  box-shadow: none; /* Removendo o box-shadow */
+  background-color: rgba(255, 255, 255, 0.05); /* Fundo transparente */
+  margin-top: 0; /* Remover espaço superior */
+  backdrop-filter: blur(10px); /* Adicionando desfoque ao fundo */
+  border: none; /* Remover borda */
+  z-index: 1000;
+  font-family: Arial, sans-serif; /* Fontes mais legíveis */
+  font-size: 1rem; /* Tamanho de fonte legível (16px) */
+  line-height: 1.5; /* Maior espaçamento entre as linhas */
 }
 
-.container {
-  max-width: 100%;
-  transition: margin-top 0.3s ease;
-  padding-top: 20px;
+/* Melhorando o input para acessibilidade */
+.sticky-search input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem; /* Tamanho de fonte ajustado para facilitar a leitura */
+  color: #333; /* Cor do texto mais escura para maior contraste */
+  background-color: #fff; /* Fundo branco */
+  border: 1px solid #ccc; /* Borda sutil */
+  border-radius: 8px; /* Bordas arredondadas */
+  outline: none; /* Remover outline padrão */
+  box-sizing: border-box; /* Garantir que o padding não afete a largura total */
+  transition: all 0.3s ease; /* Suaviza o efeito ao focar */
 }
 
-.container + .container {
-  margin-top: 20px;
+/* Foco no input para acessibilidade */
+.sticky-search input:focus {
+  border-color: #1e40af; /* Borda azul quando em foco */
+  background-color: #f0f8ff; /* Fundo azul claro ao focar */
+  box-shadow: 0 0 5px rgba(30, 64, 175, 0.5); /* Sombras suaves para indicar foco */
 }
 
-.container .grid {
-  margin-top: 20px;
+/* Aumentando a legibilidade do botão */
+.clear-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 50%;
+  font-size: 10px; /* Tamanho do texto do botão para legibilidade */
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.clear-btn:hover {
+  background-color: #e60000;
+}
+
+.clear-btn:focus {
+  outline: 3px solid #1e40af; /* Indicação clara de foco */
+}
+
+
+
+/* Botão de minimizar */
+.toggle-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #1e40af;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 50%;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #1e3a8a;
+}
+
+/* Ajuste para resultados */
+.results {
+  margin-top: 120px;
 }
 </style>
+
