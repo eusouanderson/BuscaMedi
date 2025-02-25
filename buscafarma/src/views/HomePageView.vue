@@ -36,7 +36,7 @@
     </div>
 
     <!-- Se não houver pesquisa ou resultados, exibe o Carousel -->
-    <ProductCarousel v-if="!searchQuery && medicines.length === 0" />
+    <ProductCarousel v-if="!searchQuery && medicines.length === 0" /> 
 
     <!-- Resultados de busca -->
     <div v-if="medicines.length > 0" class="container mx-auto px-4 py-6 results">
