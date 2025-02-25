@@ -10,8 +10,8 @@
 
         <!-- Navegação -->
         <nav class="space-x-6 flex mb-4 md:mb-0">
-          <a href="#" class="hover:text-gray-300 transition-colors">Quem somos</a>
-          <a href="#" class="hover:text-gray-300 transition-colors">Saúde e bem estar</a>
+          <a href="/whoweare" class="hover:text-gray-300 transition-colors">Quem somos</a>
+          <a href="/health" class="hover:text-gray-300 transition-colors">Saúde e bem estar</a>
           <a href="#" class="hover:text-gray-300 transition-colors">Farmacias Parceiras</a>
           <a href="#" class="hover:text-gray-300 transition-colors">Contato</a>
         </nav>

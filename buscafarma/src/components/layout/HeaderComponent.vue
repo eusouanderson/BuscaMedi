@@ -28,8 +28,8 @@
     <!-- Menu Mobile -->
     <div v-if="menuOpen" class="md:hidden bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl rounded-t-3xl transition-all">
       <div class="p-4 flex flex-col space-y-8">
-        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Quem somos</a>
-        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Saude e bem estar</a>
+        <a href="/whoweare" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Quem somos</a>
+        <a href="/health" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Saude e bem estar</a>
         <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Farmacias Parceiras</a>
         <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Contato</a>
       </div>

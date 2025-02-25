@@ -168,7 +168,7 @@ export default {
     selectMedicine(medicine) {
       this.searchQuery = medicine.name;
       this.suggestions = [];
-      this.fetchMedicines();  // Corrigido para chamar diretamente fetchMedicines
+      this.fetchMedicines();  
     },
 
     // Método para limpar a pesquisa
