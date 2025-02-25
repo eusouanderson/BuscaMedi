@@ -1,8 +1,6 @@
 <template>
   <div class="Home">
-    <div 
-      :class="['Input', { 'sticky-search': medicines.length > 0 }]"
-    >
+    <div :class="['Input', { 'sticky-search': medicines.length > 0 }]">
       <div class="py-2">
         <div class="container mx-auto px-4">
           <h2 class="text-3xl font-semibold text-center text-blue-800 mb-2">
@@ -29,17 +27,16 @@
           </div>
         </div>
       </div>
-      <button 
-        @click="clearSearch"
-        class="clear-btn"
-      >
-        Limpar
-      </button>
+      <button @click="clearSearch" class="clear-btn">Limpar</button>
     </div>
-    <!---Icone de carregamento-->
+
+    <!-- Carregamento -->
     <div v-if="loading" class="loading">
       <font-awesome-icon icon="spinner" spin />
     </div>
+
+    <!-- Se não houver pesquisa ou resultados, exibe o Carousel -->
+    <ProductCarousel v-if="!searchQuery && medicines.length === 0" />
 
     <!-- Resultados de busca -->
     <div v-if="medicines.length > 0" class="container mx-auto px-4 py-6 results">
@@ -58,11 +55,7 @@
           <button class="search-link-btn" @click="openSearchLink(medicine.search_link)">
             Pesquisar no google
           </button>
-          
-          <button 
-            class="add-to-cart-btn"
-            @click="addToCart(medicine)"
-          >
+          <button class="add-to-cart-btn" @click="addToCart(medicine)">
             Adicionar ao carrinho
           </button>
         </div>
@@ -72,20 +65,23 @@
     <div v-if="error" class="text-red-600 text-center mt-4">
       {{ error }}
     </div>
-
+    
     <!-- Importando o componente de carrinho -->
     <Cart :cart="cart" @clearCart="clearCart" />
   </div>
 </template>
 
+
 <script>
-import { searchMedicines } from '@/services/medicineService';
-import Cart from '@/components/Cart.vue'; // Importando o componente de carrinho
+import { searchMedicines } from '@/services/medicineService.js';
+import ProductCarousel from '@/components/ui/ProductCarousel.vue';
+import Cart from '@/components/ui/Cart.vue';
 
 export default {
   name: 'HomeComponent',
   components: {
-    Cart, // Registrando o componente
+    Cart, 
+    ProductCarousel
   },
   data() {
     return {

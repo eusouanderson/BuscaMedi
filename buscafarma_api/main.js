@@ -42,14 +42,31 @@ app.get("/", (req, res) => {
   res.send("BuscaFarma API");
 });
 
-app.get("/products", async (req, res) => {
+app.get("/products/:qtd", async (req, res) => {
   try {
-    const products = await Product.find();
+
+    const qtd = parseInt(req.params.qtd, 10); 
+
+    const cachedProduct = cache.get(qtd);
+    if (cachedProduct) {
+      console.log("🔹 Produto encontrado no cache!");
+      return res.json(cachedProduct);
+    }
+    
+    if (isNaN(qtd) || qtd <= 0) {
+      return res.status(400).json({ error: "Quantidade inválida" });
+    }
+
+    const products = await Product.find().limit(qtd); 
     res.json(products);
+
+    cache.set(qtd, products);
+
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar produtos" });
   }
 });
+
 
 
 app.get("/products/:id", async (req, res) => {

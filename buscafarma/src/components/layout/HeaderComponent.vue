@@ -11,8 +11,9 @@
 
         <!-- Navegação Desktop -->
         <nav class="hidden md:flex space-x-6">
-          <a href="#" class="hover:text-gray-300 transition-colors">Quem somos</a>
-          <a href="#" class="hover:text-gray-300 transition-colors">Saude e bem estar</a>
+          <a href="/" class="hover:text-gray-300 transition-colors">Inicio</a>
+          <a href="/whoweare" class="hover:text-gray-300 transition-colors">Quem somos</a>
+          <a href="/health" class="hover:text-gray-300 transition-colors">Saude e bem estar</a>
           <a href="#" class="hover:text-gray-300 transition-colors">Farmacias Parceiras</a>
           <a href="#" class="hover:text-gray-300 transition-colors">Contato</a>
         </nav>
