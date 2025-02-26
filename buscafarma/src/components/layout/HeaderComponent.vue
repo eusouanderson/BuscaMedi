@@ -1,20 +1,21 @@
 <template>
   <div class="Header">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl fixed top-0 w-full z-50">
+    <header
+      class="bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl fixed top-0 w-full z-50">
       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <!-- Logo e Nome -->
         <div class="flex items-center space-x-3">
-          <img :src="iconPath" alt="Logo" class="w-24 h-24 rounded-full border-2 border-white"/>
-          <span class="text-2xl font-semibold tracking-wide">Farmacia+</span>
+          <img :src="iconPath" alt="Logo" class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white" />
+          <span class="text-lg sm:text-2xl font-semibold tracking-wide">Farmacia+</span>
         </div>
 
         <!-- Navegação Desktop -->
         <nav class="hidden md:flex space-x-6">
           <a href="/" class="hover:text-gray-300 transition-colors">Inicio</a>
           <a href="/whoweare" class="hover:text-gray-300 transition-colors">Quem somos</a>
-          <a href="/health" class="hover:text-gray-300 transition-colors">Saude e bem estar</a>
-          <a href="#" class="hover:text-gray-300 transition-colors">Farmacias Parceiras</a>
+          <a href="/health" class="hover:text-gray-300 transition-colors">Saúde e bem-estar</a>
+          <a href="#" class="hover:text-gray-300 transition-colors">Farmácias Parceiras</a>
           <a href="#" class="hover:text-gray-300 transition-colors">Contato</a>
         </nav>
 
@@ -25,17 +26,19 @@
       </div>
     </header>
 
-    <!-- Menu Mobile -->
-    <div v-if="menuOpen" class="md:hidden bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl rounded-t-3xl transition-all">
-      <div class="p-4 flex flex-col space-y-8">
-        
-        <a href="/whoweare" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Quem somos</a>
-        <a href="/health" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Saude e bem estar</a>
-        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Farmacias Parceiras</a>
-        <a href="#" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Contato</a>
-        <a href="/" class="block text-lg py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Inicio</a>
+    <!-- Menu Mobile com Transição -->
+    <transition name="slide">
+      <div v-if="menuOpen"
+        class="md:hidden bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl absolute top-20 w-full left-0 transition-all">
+        <div class="p-4 flex flex-col space-y-4">
+          <a href="/whoweare" class="menu-link">Quem somos</a>
+          <a href="/health" class="menu-link">Saúde e bem-estar</a>
+          <a href="#" class="menu-link">Farmácias Parceiras</a>
+          <a href="#" class="menu-link">Contato</a>
+          <a href="/" class="menu-link">Inicio</a>
+        </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -65,14 +68,31 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Links do menu mobile */
+.Header {
+  z-index: 1000;
+}
+.menu-link {
+  display: block;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 /* Animação do menu */
-.slide-enter-active, .slide-leave-active {
+.slide-enter-active,
+.slide-leave-active {
   transition: transform 0.3s ease-in-out;
 }
-.slide-enter-from, .slide-leave-to {
+
+.slide-enter-from,
+.slide-leave-to {
   transform: translateY(-100%);
 }
 </style>
-
-
-
