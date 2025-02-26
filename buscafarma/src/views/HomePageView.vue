@@ -11,7 +11,6 @@
             <input id="search-input" type="text" v-model="searchQuery"
               class="w-full p-4 border border-gray-300 rounded-lg text-sm" placeholder="Digite o nome do medicamento..."
               @input="handleInput" @keyup.enter="clearSuggestions" aria-describedby="search-info" />
-            <!-- Lista de sugestões -->
             <ul v-if="suggestions.length > 0" class="suggestions-list" role="listbox" aria-labelledby="search-heading">
               <li v-for="suggestion in suggestions" :key="suggestion._id" @click="selectMedicine(suggestion)"
                 role="option" :aria-label="'Selecionar ' + suggestion.name">
@@ -31,21 +30,17 @@
       <font-awesome-icon icon="spinner" spin />
     </div>
 
-    <!-- Se não houver pesquisa ou resultados, exibe o Carousel -->
-    <div class="flex justify-center items-center w-full py-6" v-if="!searchQuery && medicines.length === 0"
-      aria-live="polite">
+    <div class="flex justify-center items-center w-full py-6" v-if="!searchQuery && medicines.length === 0">
       <ProductCarousel />
     </div>
 
-    <!-- Resultados de busca -->
     <div v-if="medicines.length > 0" class="max-w-6xl mx-auto px-4 py-6">
       <h3 class="text-2xl font-semibold text-blue-800 mb-4 text-center" id="results-heading">
         Resultados encontrados
       </h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <div v-for="medicine in medicines" :key="medicine._id"
-          class="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center text-center"
-          aria-labelledby="results-heading">
+          class="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center text-center">
           <img :src="medicine.image_url" :alt="`Imagem do medicamento ${medicine.name}`"
             class="w-32 h-32 object-contain mb-2" loading="lazy" />
           <h4 class="text-sm font-semibold">{{ medicine.name }}</h4>
@@ -53,19 +48,14 @@
           <p class="text-xs text-gray-600">{{ medicine.offer }}</p>
           <p class="text-lg text-blue-800 font-bold">{{ medicine.price }}</p>
           <p class="text-xs text-gray-600">Disponibilidade: {{ medicine.availability }}</p>
-
-          <!-- Mostrar o botão "Farmacia Parceira" somente se o link existir -->
           <button v-if="medicine.link" class="search-link-btn-parceira text-sm mt-2"
             @click="openSearchLink(medicine.link)" aria-label="Abrir link para a farmácia parceira">
             Farmacia Parceira
           </button>
-
-          <!-- Mostrar o botão "Pesquisar no Google" somente se o link de pesquisa existir -->
           <button v-if="medicine.search_link" class="search-link-btn text-sm mt-2"
             @click="openSearchLink(medicine.search_link)" aria-label="Pesquisar no Google">
             Pesquisar no Google
           </button>
-
           <button
             class="add-to-cart-btn bg-blue-500 text-black text-sm font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300 mt-2"
             @click="addToCart(medicine)" aria-label="Adicionar ao carrinho">
@@ -79,10 +69,10 @@
       {{ error }}
     </div>
 
-    <!-- Importando o componente de carrinho -->
     <Cart :cart="cart" @clearCart="clearCart" />
   </div>
 </template>
+
 
 <script>
 import { searchMedicines } from '@/services/medicineService.js';
@@ -232,10 +222,10 @@ export default {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
   z-index: 1000;
   width: 90%;
   max-width: 500px;
+  transition: all 0.3s ease;
 }
 
 /* Input que fica fixo no topo após a pesquisa */
