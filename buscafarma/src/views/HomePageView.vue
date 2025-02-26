@@ -13,6 +13,7 @@
               class="w-full p-4 border border-gray-300 rounded-lg text-sm"
               placeholder="Digite o nome do medicamento..."
               @input="handleInput"
+              @keyup.enter="clearSuggestions"
             />
             <!-- Lista de sugestões -->
             <ul v-if="suggestions.length > 0" class="suggestions-list">
@@ -118,15 +119,14 @@ export default {
 
       try {
         this.loading = true;
-        const response = await this.fetchMedicines();  // Corrigido para chamar diretamente fetchMedicines
+        const response = await this.fetchMedicines();  
         if (Array.isArray(response)) {
-          // Filtra as sugestões de acordo com a pesquisa
+          
           this.suggestions = response.filter(medicine =>
             medicine.name.toLowerCase().includes(this.searchQuery.toLowerCase())
           );
           this.medicines = response;
-
-          // Armazena os resultados no localStorage para consultas futuras
+          
           localStorage.setItem(this.searchQuery, JSON.stringify(response));
         } else {
           this.suggestions = [];
@@ -138,6 +138,10 @@ export default {
         this.loading = false;
       }
     },
+    async clearSuggestions() {
+      this.suggestions = [];
+    },
+      
 
     // Método para buscar os medicamentos
     async fetchMedicines() {
