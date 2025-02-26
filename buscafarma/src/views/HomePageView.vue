@@ -2,8 +2,8 @@
   <div class="Home">
     <div :class="['Input', { 'sticky-search': medicines.length > 0 }]">
       <div class="py-2">
-        <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-semibold text-center text-blue-800 mb-2">
+        <div class="max-w-4xl mx-auto px-4">
+          <h2 class="text-3xl font-semibold text-center text-blue-800 mb-4">
             Encontre o melhor preço para seus medicamentos
           </h2>
           <div class="max-w-md mx-auto relative">
@@ -15,58 +15,75 @@
                 {{ suggestion.name }}
               </li>
             </ul>
+            <!--- Filtro de preço -->
+            <div v-if="medicines.length > 0" class="filter-container max-w-md mx-auto my-4">
+              <label for="priceFilter" class="block text-sm text-gray-700">Ordenar por preço:</label>
+              <select id="priceFilter" v-model="priceFilter" @change="sortMedicines"
+                class="w-full p-2 border border-gray-300 rounded-lg">
+                <option value="default">Selecione...</option>
+                <option value="asc">Preço: Menor para Maior</option>
+                <option value="desc">Preço: Maior para Menor</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
-      <button @click="clearSearch" class="clear-btn" aria-label="Limpar a pesquisa">
-        Limpar
-      </button>
+      <!-- Botão de limpar pesquisa e fazer o scroll para o topo -->
+      <button @click="clearSearch(); scrollToTop()" class="clear-btn">Limpar</button>
+
     </div>
 
     <!-- Carregamento -->
-    <div v-if="loading" class="loading" role="status" aria-live="polite">
+    <div v-if="loading" class="loading">
       <font-awesome-icon icon="spinner" spin />
     </div>
 
+    <!-- Se não houver pesquisa ou resultados, exibe o Carousel -->
     <div class="flex justify-center items-center w-full py-6" v-if="!searchQuery && medicines.length === 0">
       <ProductCarousel />
     </div>
 
-    <div v-if="medicines.length > 0" class="max-w-6xl mx-auto px-4 py-6">
-      <h3 class="text-2xl font-semibold text-blue-800 mb-4 text-center" id="results-heading">
-        Resultados encontrados
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+    <!-- Resultados de busca -->
+    <div v-if="medicines.length > 0" class="results ">
+
+
+      <div class="results-grid ">
         <div v-for="medicine in medicines" :key="medicine._id"
           class="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center text-center">
-          <img :src="medicine.image_url" :alt="`Imagem do medicamento ${medicine.name}`"
-            class="w-32 h-32 object-contain mb-2" loading="lazy" />
+          <img :src="medicine.image_url" :alt="medicine.name" class="w-32 h-32 object-contain mb-2" />
           <h4 class="text-sm font-semibold">{{ medicine.name }}</h4>
           <p class="text-xs text-gray-500">{{ medicine.manufacturer }}</p>
           <p class="text-xs text-gray-600">{{ medicine.offer }}</p>
           <p class="text-lg text-blue-800 font-bold">{{ medicine.price }}</p>
           <p class="text-xs text-gray-600">Disponibilidade: {{ medicine.availability }}</p>
+          <!-- Mostrar o botão "Farmacia Parceira" somente se o link existir -->
           <button v-if="medicine.link" class="search-link-btn-parceira text-sm mt-2"
-            @click="openSearchLink(medicine.link)" aria-label="Abrir link para a farmácia parceira">
+            @click="openSearchLink(medicine.link)">
             Farmacia Parceira
           </button>
+
+          <!-- Mostrar o botão "Pesquisar no Google" somente se o link de pesquisa existir -->
           <button v-if="medicine.search_link" class="search-link-btn text-sm mt-2"
-            @click="openSearchLink(medicine.search_link)" aria-label="Pesquisar no Google">
+            @click="openSearchLink(medicine.search_link)">
             Pesquisar no Google
           </button>
+
+
           <button
             class="add-to-cart-btn bg-blue-500 text-black text-sm font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300 mt-2"
-            @click="addToCart(medicine)" aria-label="Adicionar ao carrinho">
+            @click="addToCart(medicine)">
             Adicionar ao carrinho
           </button>
         </div>
       </div>
     </div>
 
-    <div v-if="error" class="text-red-600 text-center mt-4" role="alert" aria-live="assertive">
+    <div v-if="error" class="text-red-600 text-center mt-4">
       {{ error }}
     </div>
 
+    <!-- Importando o componente de carrinho -->
     <Cart :cart="cart" @clearCart="clearCart" />
   </div>
 </template>
@@ -91,10 +108,31 @@ export default {
       error: null,
       cart: [],
       loading: false,
+      priceFilter: 'default',
     };
   },
   methods: {
+    
+    // Metodo para ordenar os medicamentos pelo preço
+    sortMedicines() {
+      if (this.priceFilter === 'asc') {
+        this.medicines.sort((a, b) => {
+          const priceA = parseFloat(a.price.replace(/[^0-9.-]+/g, '')); // Remover símbolos de moeda, se houver
+          const priceB = parseFloat(b.price.replace(/[^0-9.-]+/g, ''));
+          return priceA - priceB; // Menor para maior
+        });
+      } else if (this.priceFilter === 'desc') {
+        this.medicines.sort((a, b) => {
+          const priceA = parseFloat(a.price.replace(/[^0-9.-]+/g, '')); // Remover símbolos de moeda
+          const priceB = parseFloat(b.price.replace(/[^0-9.-]+/g, ''));
+          return priceB - priceA; // Maior para menor
+        });
+      }
+    },
+
+  
     // Método para lidar com a entrada do usuário e fazer a busca
+    
     async handleInput() {
       if (this.searchQuery.length < 3) {
         this.suggestions = [];
@@ -146,7 +184,7 @@ export default {
       if (!this.searchQuery.trim()) {
         this.suggestions = [];
         this.medicines = [];
-        return;
+        return [];
       }
 
       this.error = null;
@@ -154,6 +192,7 @@ export default {
       try {
         const response = await searchMedicines(this.searchQuery); // Chama a função de busca externa
         if (Array.isArray(response)) {
+          this.sortMedicines();
           this.medicines = response;
           return response; // Retorna a resposta para uso no handleInput
         } else {
@@ -162,8 +201,16 @@ export default {
         }
       } catch (err) {
         this.error = "Erro ao buscar medicamentos.";
+        this.medicines = [];
         return [];
       }
+    },
+    //Método para quando clicar no limpar o scroll volta ao topo
+    scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     },
 
     // Método para selecionar um medicamento
@@ -188,6 +235,19 @@ export default {
     clearCart() {
       this.cart = []; // Limpa o carrinho
     },
+    // Metodo para quando rolar o scroll o input fixar no topo
+    handleScroll() {
+      const inputElement = document.querySelector('.Input');
+      if (inputElement) {
+        const inputRect = inputElement.getBoundingClientRect();
+        const inputTop = inputRect.top + window.scrollY;
+        if (inputTop < window.scrollY) {
+          inputElement.classList.add('sticky-search');
+        } else {
+          inputElement.classList.remove('sticky-search');
+        }
+      }
+    },
 
     // Método para abrir o link de pesquisa
     openSearchLink(link) {
@@ -202,65 +262,90 @@ export default {
 </script>
 
 <style scoped>
+/* Estilo da Home */
 .Home {
   background-image: url('@/assets/images/medicine.jpg');
   background-size: cover;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7fafc;
 }
 
-/* Input centralizado inicialmente */
+/* Input centralizado */
 .Input {
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 20px 30px;
+  border-radius: 20px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
   position: relative;
   z-index: 1000;
+  width: 100%;
+  max-width: 500px;
   margin-top: 20vh;
-  /* 20% da altura da tela */
 }
 
-/* Input que fica fixo no topo após a pesquisa */
+/* Efeito no hover do Input */
+.Input:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Input de pesquisa com foco */
+.Input input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #1e40af;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.Input input:focus {
+  border-color: #4b9a2f;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 162, 255, 0.7);
+}
+
+/* Estilo para a barra de pesquisa fixa */
 .sticky-search {
   position: fixed;
   color: #1e40af;
   top: 0;
   width: 100%;
-  padding: 15px 20px;
-  box-shadow: none;
-  background-color: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.9);
   margin-top: 0;
   backdrop-filter: blur(10px);
-  border: none;
   z-index: 1000;
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   font-size: 16px;
-  color: white;
 }
 
 /* Lista de sugestões */
 .suggestions-list {
   position: absolute;
-  color: #1e40af;
   top: 100%;
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #ccc;
-  max-height: 150px;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  max-height: 200px;
   overflow-y: auto;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 500;
   padding: 0;
-  margin-top: 2px;
+  margin-top: 5px;
 }
 
 .suggestions-list li {
-  padding: 10px;
+  padding: 12px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .suggestions-list li:hover {
@@ -272,80 +357,67 @@ export default {
   display: inline-block;
   background-color: #ff4d4d;
   color: white;
-  padding: 5px 10px;
+  padding: 8px 14px;
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 10px;
-  text-align: center;
+  margin-top: 15px;
 }
 
 .clear-btn:hover {
-  background-color: #ff0000;
+  background-color: #e53935;
 }
 
-/* Estilos para o carousel */
+/* Estilo para os botões de ação */
+.search-link-btn,
 .search-link-btn-parceira {
-  background-color: #4b9a2f;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.search-link-btn {
   background-color: #4189e1;
   color: white;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 12px 20px;
+  border-radius: 8px;
   text-align: center;
+  font-size: 16px;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
 }
 
+.search-link-btn:hover,
 .search-link-btn-parceira:hover {
-  background-color: #3c8328;
-}
-
-.search-link-btn:hover {
   background-color: #3572cb;
 }
-
-
-.search-link-btn-parceira {
-  margin-top: 10px;
-  background-color: #1e7aaf;
-  /* Cor azul contrastante */
-  color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.search-link-btn-parceira:hover {
-  background-color: #202b48;
-}
-
-
-/* Ajuste para resultados */
 .results {
-  margin-top: 120px;
+  margin-top: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 colunas de largura igual */
+  gap: 20px;
+  margin-top: 20px;
+}
+/* Estilos adicionais para mobile */
+@media (max-width: 768px) {
+  .Input {
+    max-width: 90%;
+    margin-top: 10vh;
+  }
+
+  .sticky-search {
+    padding: 15px;
+  }
+
+  .search-link-btn,
+  .search-link-btn-parceira {
+    padding: 10px 15px;
+  }
 }
 
-.suggestions-list {
-  position: fixed;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background: white;
-  border: 1px solid #ccc;
-  border-top: none;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  z-index: 10;
-  max-height: 200px;
-  overflow-y: auto;
+.filter-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
-
 </style>
