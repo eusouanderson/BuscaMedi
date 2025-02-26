@@ -3,72 +3,79 @@
     <div :class="['Input', { 'sticky-search': medicines.length > 0 }]">
       <div class="py-2">
         <div class="max-w-4xl mx-auto px-4">
-          <h2 class="text-3xl font-semibold text-center text-blue-800 mb-4">
+          <h2 class="text-3xl font-semibold text-center text-blue-800 mb-4" id="search-heading">
             Encontre o melhor preço para seus medicamentos
           </h2>
           <div class="max-w-md mx-auto relative">
-            <input type="text" v-model="searchQuery" class="w-full p-4 border border-gray-300 rounded-lg text-sm"
-              placeholder="Digite o nome do medicamento..." @input="handleInput" @keyup.enter="clearSuggestions" />
+            <label for="search-input" class="sr-only">Digite o nome do medicamento</label>
+            <input id="search-input" type="text" v-model="searchQuery"
+              class="w-full p-4 border border-gray-300 rounded-lg text-sm" placeholder="Digite o nome do medicamento..."
+              @input="handleInput" @keyup.enter="clearSuggestions" aria-describedby="search-info" />
             <!-- Lista de sugestões -->
-            <ul v-if="suggestions.length > 0" class="suggestions-list">
-              <li v-for="suggestion in suggestions" :key="suggestion._id" @click="selectMedicine(suggestion)">
+            <ul v-if="suggestions.length > 0" class="suggestions-list" role="listbox" aria-labelledby="search-heading">
+              <li v-for="suggestion in suggestions" :key="suggestion._id" @click="selectMedicine(suggestion)"
+                role="option" :aria-label="'Selecionar ' + suggestion.name">
                 {{ suggestion.name }}
               </li>
             </ul>
           </div>
         </div>
       </div>
-      <button @click="clearSearch" class="clear-btn">Limpar</button>
+      <button @click="clearSearch" class="clear-btn" aria-label="Limpar a pesquisa">
+        Limpar
+      </button>
     </div>
 
     <!-- Carregamento -->
-    <div v-if="loading" class="loading">
+    <div v-if="loading" class="loading" role="status" aria-live="polite">
       <font-awesome-icon icon="spinner" spin />
     </div>
 
     <!-- Se não houver pesquisa ou resultados, exibe o Carousel -->
-    <div class="flex justify-center items-center w-full py-6" v-if="!searchQuery && medicines.length === 0">
+    <div class="flex justify-center items-center w-full py-6" v-if="!searchQuery && medicines.length === 0"
+      aria-live="polite">
       <ProductCarousel />
     </div>
 
-
     <!-- Resultados de busca -->
     <div v-if="medicines.length > 0" class="max-w-6xl mx-auto px-4 py-6">
-      <h3 class="text-2xl font-semibold text-blue-800 mb-4 text-center">
+      <h3 class="text-2xl font-semibold text-blue-800 mb-4 text-center" id="results-heading">
         Resultados encontrados
       </h3>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div v-for="medicine in medicines" :key="medicine._id"
-          class="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center text-center">
-          <img :src="medicine.image_url" :alt="medicine.name" class="w-32 h-32 object-contain mb-2" />
+          class="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center text-center"
+          aria-labelledby="results-heading">
+          <img :src="medicine.image_url" :alt="`Imagem do medicamento ${medicine.name}`"
+            class="w-32 h-32 object-contain mb-2" loading="lazy" />
           <h4 class="text-sm font-semibold">{{ medicine.name }}</h4>
           <p class="text-xs text-gray-500">{{ medicine.manufacturer }}</p>
           <p class="text-xs text-gray-600">{{ medicine.offer }}</p>
           <p class="text-lg text-blue-800 font-bold">{{ medicine.price }}</p>
           <p class="text-xs text-gray-600">Disponibilidade: {{ medicine.availability }}</p>
+
           <!-- Mostrar o botão "Farmacia Parceira" somente se o link existir -->
           <button v-if="medicine.link" class="search-link-btn-parceira text-sm mt-2"
-            @click="openSearchLink(medicine.link)">
+            @click="openSearchLink(medicine.link)" aria-label="Abrir link para a farmácia parceira">
             Farmacia Parceira
           </button>
 
           <!-- Mostrar o botão "Pesquisar no Google" somente se o link de pesquisa existir -->
           <button v-if="medicine.search_link" class="search-link-btn text-sm mt-2"
-            @click="openSearchLink(medicine.search_link)">
+            @click="openSearchLink(medicine.search_link)" aria-label="Pesquisar no Google">
             Pesquisar no Google
           </button>
 
-          
           <button
             class="add-to-cart-btn bg-blue-500 text-black text-sm font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300 mt-2"
-            @click="addToCart(medicine)">
+            @click="addToCart(medicine)" aria-label="Adicionar ao carrinho">
             Adicionar ao carrinho
           </button>
         </div>
       </div>
     </div>
 
-    <div v-if="error" class="text-red-600 text-center mt-4">
+    <div v-if="error" class="text-red-600 text-center mt-4" role="alert" aria-live="assertive">
       {{ error }}
     </div>
 
@@ -76,8 +83,6 @@
     <Cart :cart="cart" @clearCart="clearCart" />
   </div>
 </template>
-
-
 
 <script>
 import { searchMedicines } from '@/services/medicineService.js';
@@ -148,7 +153,6 @@ export default {
       this.suggestions = [];
     },
 
-
     // Método para buscar os medicamentos
     async fetchMedicines() {
       if (!this.searchQuery.trim()) {
@@ -207,15 +211,13 @@ export default {
     },
   },
 };
-
 </script>
-
 
 <style scoped>
 .Home {
   background-image: url('@/assets/images/medicine.jpg');
   background-size: cover;
-  min-height: 150vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -234,122 +236,94 @@ export default {
   z-index: 1000;
   width: 90%;
   max-width: 500px;
-  /* Para não ficar muito grande */
 }
 
 /* Input que fica fixo no topo após a pesquisa */
 .sticky-search {
   position: fixed;
   color: #1e40af;
-  /* Cor azul contrastante */
   top: 0;
   width: 100%;
   padding: 15px 20px;
   box-shadow: none;
-  /* Removendo o box-shadow */
   background-color: rgba(255, 255, 255, 0.05);
-  /* Fundo transparente */
   margin-top: 0;
-  /* Remover espaço superior */
   backdrop-filter: blur(10px);
-  /* Adicionando desfoque ao fundo */
   border: none;
-  /* Remover borda */
   z-index: 1000;
   font-family: Arial, sans-serif;
-  /* Fontes mais legíveis */
-  font-size: 1rem;
-  /* Tamanho de fonte legível (16px) */
-  line-height: 1.5;
-  /* Maior espaçamento entre as linhas */
+  font-size: 16px;
+  color: white;
 }
 
-/* Melhorando o input para acessibilidade */
-.sticky-search input {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 1rem;
-  /* Tamanho de fonte ajustado para facilitar a leitura */
-  color: #333;
-  /* Cor do texto mais escura para maior contraste */
-  background-color: #fff;
-  /* Fundo branco */
-  border: 1px solid #ccc;
-  /* Borda sutil */
-  border-radius: 8px;
-  /* Bordas arredondadas */
-  outline: none;
-  /* Remover outline padrão */
-  box-sizing: border-box;
-  /* Garantir que o padding não afete a largura total */
-  transition: all 0.3s ease;
-  /* Suaviza o efeito ao focar */
-}
-
-/* Foco no input para acessibilidade */
-.sticky-search input:focus {
-  border-color: #1e40af;
-  /* Borda azul quando em foco */
-  background-color: #f0f8ff;
-  /* Fundo azul claro ao focar */
-  box-shadow: 0 0 5px rgba(30, 64, 175, 0.5);
-  /* Sombras suaves para indicar foco */
-}
-
-/* Aumentando a legibilidade do botão */
-.clear-btn {
+/* Lista de sugestões */
+.suggestions-list {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  color: #1e40af;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 500;
+  padding: 0;
+  margin-top: 2px;
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background-color: #f0f0f0;
+}
+
+/* Botão de limpar pesquisa */
+.clear-btn {
+  display: inline-block;
   background-color: #ff4d4d;
   color: white;
-  padding: 10px 14px;
-  border-radius: 50%;
-  font-size: 10px;
-  /* Tamanho do texto do botão para legibilidade */
+  padding: 5px 10px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  text-align: center;
 }
 
 .clear-btn:hover {
-  background-color: #e60000;
+  background-color: #ff0000;
 }
 
-.clear-btn:focus {
-  outline: 3px solid #1e40af;
-  /* Indicação clara de foco */
-}
-.add-to-cart-btn {
-  margin-top: 10px;
-  background-color: #913d0d;
-  /* Cor azul contrastante */
+/* Estilos para o carousel */
+.search-link-btn-parceira {
+  background-color: #4b9a2f;
   color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.add-to-cart-btn:hover {
-  background-color: #f59a9a;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
 }
 
 .search-link-btn {
-  margin-top: 10px;
-  background-color: #1e40af;
-  /* Cor azul contrastante */
+  background-color: #4189e1;
   color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.3s ease;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.search-link-btn-parceira:hover {
+  background-color: #3c8328;
 }
 
 .search-link-btn:hover {
-  background-color: #7490dd;
+  background-color: #3572cb;
 }
+
 
 .search-link-btn-parceira {
   margin-top: 10px;
@@ -388,6 +362,5 @@ export default {
   max-height: 200px;
   overflow-y: auto;
 }
-
 
 </style>
