@@ -393,7 +393,7 @@ export default {
 }
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   /* 4 colunas de largura igual */
   gap: 20px;
   margin-top: 20px;
