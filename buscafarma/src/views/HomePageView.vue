@@ -2,18 +2,16 @@
   <div class="Home">
     <div :class="['Input', { 'sticky-search': medicines.length > 0 }]">
       <div class="py-2">
-        <div class="max-w-4xl mx-auto px-4">
-          <h2 class="text-3xl font-semibold text-center text-blue-800 mb-4" id="search-heading">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-semibold text-center text-blue-800 mb-2">
             Encontre o melhor preço para seus medicamentos
           </h2>
           <div class="max-w-md mx-auto relative">
-            <label for="search-input" class="sr-only">Digite o nome do medicamento</label>
-            <input id="search-input" type="text" v-model="searchQuery"
-              class="w-full p-4 border border-gray-300 rounded-lg text-sm" placeholder="Digite o nome do medicamento..."
-              @input="handleInput" @keyup.enter="clearSuggestions" aria-describedby="search-info" />
-            <ul v-if="suggestions.length > 0" class="suggestions-list" role="listbox" aria-labelledby="search-heading">
-              <li v-for="suggestion in suggestions" :key="suggestion._id" @click="selectMedicine(suggestion)"
-                role="option" :aria-label="'Selecionar ' + suggestion.name">
+            <input type="text" v-model="searchQuery" class="w-full p-4 border border-gray-300 rounded-lg text-sm"
+              placeholder="Digite o nome do medicamento..." @input="handleInput" @keyup.enter="clearSuggestions" />
+            <!-- Lista de sugestões -->
+            <ul v-if="suggestions.length > 0" class="suggestions-list">
+              <li v-for="suggestion in suggestions" :key="suggestion._id" @click="selectMedicine(suggestion)">
                 {{ suggestion.name }}
               </li>
             </ul>
@@ -214,18 +212,15 @@ export default {
 
 /* Input centralizado inicialmente */
 .Input {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   background-color: rgba(255, 255, 255, 0.9);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  width: 90%;
-  max-width: 500px;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1000;
+  margin-top: 20vh;
+  /* 20% da altura da tela */
 }
 
 /* Input que fica fixo no topo após a pesquisa */
