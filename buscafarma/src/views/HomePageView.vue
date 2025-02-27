@@ -3,7 +3,7 @@
     <div :class="['Input', { 'sticky-search': medicines.length > 0 }]">
       <div class="py-2">
         <div class="max-w-4xl mx-auto px-4">
-          <h2 class="text-3xl font-semibold text-center text-blue-800 mb-4">
+          <h2 class="texto text-3xl font-semibold text-center text-blue-800 mb-4">
             Encontre o melhor preço para seus medicamentos
           </h2>
           <div class="max-w-md mx-auto relative">
@@ -33,9 +33,9 @@
       <font-awesome-icon icon="spinner" spin />
     </div>
 
-    <div class="flex justify-center items-center w-full py-6" v-if="!searchQuery && !medicines.length">
+    <!--<div class="flex justify-center items-center w-full py-6" v-if="!searchQuery && !medicines.length">
       <ProductCarousel />
-    </div>
+    </div>-->
 
     <div v-if="medicines.length" class="results">
       <div class="results-grid">
@@ -73,12 +73,12 @@
 
 <script>
 import { searchMedicines } from '@/services/medicineService.js';
-import ProductCarousel from '@/components/ui/ProductCarousel.vue';
+//import ProductCarousel from '@/components/ui/ProductCarousel.vue';
 import Cart from '@/components/ui/Cart.vue';
 
 export default {
   name: 'HomeComponent',
-  components: { Cart, ProductCarousel },
+  components: { Cart, },//ProductCarousel },
   data() {
     return {
       searchQuery: '',
@@ -114,12 +114,23 @@ export default {
       }
     },
     sortMedicines() {
-      if (this.priceFilter === 'asc') {
-        this.medicines.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-      } else if (this.priceFilter === 'desc') {
-        this.medicines.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
-      }
+      if (!Array.isArray(this.medicines) || this.medicines.length === 0) return;
+
+      this.medicines = this.medicines
+        .map(m => ({
+          ...m,
+          numericPrice: parseFloat(m.price.replace("R$ ", "").replace(",", ".")) // Converte preço para número
+        }))
+        .filter(m => !isNaN(m.numericPrice)) // Garante que só preços válidos passem
+        .sort((a, b) => {
+          return this.priceFilter === 'asc'
+            ? a.numericPrice - b.numericPrice
+            : b.numericPrice - a.numericPrice;
+        })
+        .map(({ numericPrice, ...m }) => ({ ...m, price: `R$ ${numericPrice.toFixed(2).replace(".", ",")}` })); // Restaura o preço formatado
     },
+
+
     selectMedicine(medicine) {
       this.searchQuery = medicine.name;
       this.suggestions = [];
@@ -180,7 +191,7 @@ export default {
   padding: 12px;
   border: 2px solid #1e40af;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 20px;
   transition: border-color 0.3s ease-in-out;
 }
 
@@ -192,7 +203,7 @@ export default {
 
 /* Quando a pesquisa estiver ativa, o input sobe para o header */
 .input-active {
-  position: fixed;
+  position: absolute;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
@@ -264,10 +275,14 @@ export default {
 
 /* Grid de resultados */
 .results {
-  margin-top: 400px;
+  margin-top: 200px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+}
+.texto {
+  text-align: center;
+  
 }
 
 .results-grid {
@@ -284,6 +299,9 @@ export default {
   .results-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .texto {
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -293,14 +311,15 @@ export default {
   }
 
   .sticky-search {
-    position: fixed;
+    position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
     background-color: white;
     z-index: 1000;
-    padding: 10px;
+    padding: 5px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 5px;
+    width: 90%;
   }
 
   .search-link-btn,
@@ -311,6 +330,22 @@ export default {
   .results-grid {
     grid-template-columns: repeat(1, 1fr);
   }
+}
+.sticky-search
+{
+  position: fixed;
+  top: 0;
+  transform: translateY(-25%);
+  background-color:  #93c5fd;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+}
+
+h2 {
+  color: #2563eb;
+  font-size: 18px;
+  
 }
 
 .filter-container {
