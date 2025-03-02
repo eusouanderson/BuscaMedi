@@ -1,8 +1,14 @@
 <template>
   <div class="Header">
+    <!-- Extensão com imagem de cumprimento -->
+    <div v-show="showGreeting" class="greeting-bar">
+      <img :src="greetingImage" alt="Bem-vindo" class="greeting-image" />
+    </div>
+
     <!-- Header -->
     <header
-      class="bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl fixed top-0 w-full z-50">
+      class="bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 text-white shadow-xl rounded-b-3xl fixed top-[50px] w-full z-50 transition-all duration-300"
+      :class="{ 'top-0': !showGreeting }">
       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <!-- Logo e Nome -->
         <div class="flex items-center space-x-3">
@@ -56,21 +62,64 @@ export default defineComponent({
   data() {
     return {
       menuOpen: false,
+      showGreeting: true,
       iconPath: new URL("@/assets/icons/mipmap-mdpi/icon.png", import.meta.url).href,
+      greetingImage: new URL("@/assets/images/greeting.webp", import.meta.url).href,
     };
   },
   methods: {
     toggleMenu() {
       this.menuOpen = !this.menuOpen;
     },
+    handleScroll() {
+      this.showGreeting = window.scrollY < 1;
+    }
   },
+  mounted() {
+    window.addEventListener("scroll", this.handleScroll);
+  },
+  beforeUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
+  }
 });
 </script>
 
 <style scoped>
-/* Links do menu mobile */
 .Header {
   z-index: 1000;
+}
+
+.greeting-bar {
+  position: relative;
+  top: 0;
+  width: 100%;
+  /* Ajusta a largura para 100% */
+  background-color: #1E40AF;
+  padding: 0 20px;
+  /* Reduz o padding nas laterais */
+  text-align: center;
+  z-index: 1001;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.greeting-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .greeting-bar {
+    padding: 0 50px;
+    /* Aumenta o padding para telas maiores */
+  }
+}
+
+@media (min-width: 1024px) {
+  .greeting-bar {
+    padding: 0 200px;
+    /* Adapta o padding para telas maiores, como desktop */
+  }
 }
 .menu-link {
   display: block;
@@ -85,7 +134,6 @@ export default defineComponent({
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Animação do menu */
 .slide-enter-active,
 .slide-leave-active {
   transition: transform 0.3s ease-in-out;
